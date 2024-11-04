@@ -140,5 +140,6 @@ ul {
 .weather-details {
   font-weight: 300;
   color: rgb(76, 207, 255);
-  justify-self: center;
+  padding-left: 1rem;
+  justify-self: left;
 }
