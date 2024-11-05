@@ -1,4 +1,4 @@
-const APIKey = "c89a66dd3f34858bd9f2e6dd41428f0b";
+const APIKey = "";
 // const APIUrl = `https://api.openweathermap.org/data/2.5/weather?&units=metric&q=sibenik`;
 
 const APIUrl = `https://api.openweathermap.org/data/2.5/forecast?q=sibenik&units=metric`;
