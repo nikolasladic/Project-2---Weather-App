@@ -1,50 +1,53 @@
-const APIKey = "";
-// const APIUrl = `https://api.openweathermap.org/data/2.5/weather?&units=metric&q=sibenik`;
+// Access the HTML components
+const button = document.querySelector(".btn");
+const searchBox = document.querySelector(".search-box");
+const cityName = document.querySelector(".cur-location");
 
-const APIUrl = `https://api.openweathermap.org/data/2.5/forecast?q=sibenik&units=metric`;
+let weatherData = null; // This will hold the data
 
+// Function for capitalizes words
 function capitalizeWords(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-async function checkWeather() {
-  const res = await fetch(APIUrl + `&appid=${APIKey}`);
-  const data = await res.json();
+// 0) Display OpenWeather API data
 
-  const sortedData = groupByDay(data.list);
-  console.log(sortedData);
+// 1) Collect the data from input field
+button.addEventListener("click", () => {});
 
-  console.log(data.list);
+// 2) Send a request to OpenWeather using city name and API
+async function fetchWeatherData(city) {
+  const APIKey = "c89a66dd3f34858bd9f2e6dd41428f0b";
+  const APIUrl = `https://api.openweathermap.org/data/2.5/forecast?q=sibenik&units=metric`;
 
-  // document.querySelector(".cur-location").innerHTML = data.name;
-  // document.querySelector(".temp-details").innerHTML =
-  //   Math.round(data.main.temp) + "°C";
-  // document.querySelector(".weather-description").innerHTML = capitalizeWords(
-  //   data.weather[0].description
-  // );
-  // document.querySelector(".feels-like").innerHTML =
-  //   "Feels like: " + Math.round(data.main.feels_like) + " °C";
-  // document.querySelector(".humidity").innerHTML =
-  //   "Humidity: " + Math.round(data.main.humidity) + "%";
-  // document.querySelector(".wind").innerHTML =
-  //   "Wind: " + Math.round(data.wind.speed) + " km/h";
-}
-
-function groupByDay(data) {
-  return data.reduce((acc, item) => {
-    // Convert timestamp to date string (e.g., "2024-11-01")
-    const date = new Date(item.dt * 1000).toISOString().split("T")[0];
-
-    // Initialize array for the date if it doesn't exist
-    if (!acc[date]) {
-      acc[date] = [];
+  try {
+    const res = await fetch(APIUrl + "&appid=" + APIKey);
+    if (!res.ok) {
+      throw new Error(`Response status: ${response.status}`);
     }
+    const data = await res.json();
+    // 3) Sorting fetched DATA from API
+    weatherData = data;
+    sortDataByDay(data);
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+fetchWeatherData();
 
-    // Push the item to the corresponding date array
-    acc[date].push(item);
+// 3.1) Function to store data
+function sortDataByDay(data) {
+  const forecastsByDay = {};
 
-    return acc;
-  }, {});
+  data.list.forEach((forecast) => {
+    const date = new Date(forecast.dt * 1000).toISOString().split("T")[0];
+    if (!forecastsByDay[date]) {
+      forecastsByDay[date] = [];
+    }
+    forecastsByDay[date].push(forecast);
+  });
+
+  console.log(forecastsByDay); // Check the result in the console or use this data in your UI
 }
 
-checkWeather();
+// 4) Display Weather
