@@ -1,53 +1,47 @@
 // Access the HTML components
-const button = document.querySelector(".btn");
+const searchButton = document.querySelector(".btn");
 const searchBox = document.querySelector(".search-box");
 const cityName = document.querySelector(".cur-location");
-
-let weatherData = null; // This will hold the data
+const tempDetails = document.querySelector("temp-details");
+const curDate = document.querySelector("cur-date");
+const curLocation = document.querySelector("cur-location");
 
 // Function for capitalizes words
 function capitalizeWords(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// 0) Display OpenWeather API data
+// Open Weather API details
+const APIKey = "c89a66dd3f34858bd9f2e6dd41428f0b";
+const APIBaseUrl = `https://api.openweathermap.org/data/2.5/forecast`;
 
-// 1) Collect the data from input field
-button.addEventListener("click", () => {});
-
-// 2) Send a request to OpenWeather using city name and API
-async function fetchWeatherData(city) {
-  const APIKey = "c89a66dd3f34858bd9f2e6dd41428f0b";
-  const APIUrl = `https://api.openweathermap.org/data/2.5/forecast?q=sibenik&units=metric`;
+// Fetch weather data on search button click
+searchButton.addEventListener("click", async () => {
+  const city = searchBox.value.trim();
+  if (city === "") {
+    curLocation.innerHTML = "Please enter a city name";
+    return;
+  }
 
   try {
-    const res = await fetch(APIUrl + "&appid=" + APIKey);
-    if (!res.ok) {
-      throw new Error(`Response status: ${response.status}`);
+    const data = await fetchWeatherData(city);
+    if (data) {
+      updateCurrentWeather(data);
+      updateWeeklyForecast(data);
     }
-    const data = await res.json();
-    // 3) Sorting fetched DATA from API
-    weatherData = data;
-    sortDataByDay(data);
   } catch (error) {
-    console.error(error.message);
+    console.error(error);
+    cityName.innerHTML = "City not found";
   }
+});
+
+// Function to fetch data
+async function fetchWeatherData(city) {
+  const APIUrl = `${APIBaseUrl}?q=${city}&appid=${APIKey}&units=metric`;
+  const res = await fetch(APIUrl);
+  if (!res.ok) {
+    throw new Error("Error fetching weather data");
+  }
+  return res.json();
 }
-fetchWeatherData();
-
-// 3.1) Function to store data
-function sortDataByDay(data) {
-  const forecastsByDay = {};
-
-  data.list.forEach((forecast) => {
-    const date = new Date(forecast.dt * 1000).toISOString().split("T")[0];
-    if (!forecastsByDay[date]) {
-      forecastsByDay[date] = [];
-    }
-    forecastsByDay[date].push(forecast);
-  });
-
-  console.log(forecastsByDay); // Check the result in the console or use this data in your UI
-}
-
-// 4) Display Weather
+// Update current weather
